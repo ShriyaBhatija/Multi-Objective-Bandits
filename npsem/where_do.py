@@ -9,11 +9,11 @@ def CC(G: CausalDiagram, X: str):
     return G.c_component(X)
 
 
-def MISs(G: CausalDiagram, Y: str) -> FrozenSet[FrozenSet[str]]:
+def MISs(G: CausalDiagram, Y: List[str]) -> FrozenSet[FrozenSet[str]]:
     """ All minimal intervention sets """
-    II = G.V - {Y}
+    II = G.V - set(Y)
     assert II <= G.V
-    assert Y not in II
+    assert not any(y in II for y in Y)
 
     G = G[G.An(Y)]
     Ws = G.causal_order(backward=True)
@@ -21,7 +21,7 @@ def MISs(G: CausalDiagram, Y: str) -> FrozenSet[FrozenSet[str]]:
     return subMISs(G, Y, frozenset(), Ws)
 
 
-def subMISs(G: CausalDiagram, Y: str, Xs: FrozenSet[str], Ws: List[str]) -> FrozenSet[FrozenSet[str]]:
+def subMISs(G: CausalDiagram, Y: List[str], Xs: FrozenSet[str], Ws: List[str]) -> FrozenSet[FrozenSet[str]]:
     """ subroutine for MISs -- this creates a recursive call tree with n, n-1, n-2, ... widths """
     out = frozenset({Xs})
     for i, W_i in enumerate(Ws):
